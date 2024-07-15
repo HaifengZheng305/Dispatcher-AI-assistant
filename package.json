@@ -1,0 +1,29 @@
+{
+  "name": "trucking-info-chatbot",
+  "version": "1.0.0",
+  "description": "This is an chatbox made for Avin Express exclusiving",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaifengZheng305/Trucking-Info-Chatbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HaifengZheng305/Trucking-Info-Chatbot/issues"
+  },
+  "homepage": "https://github.com/HaifengZheng305/Trucking-Info-Chatbot#readme",
+  "dependencies": {
+    "@langchain/community": "^0.2.18",
+    "chromadb": "^1.8.1",
+    "chromadb-default-embed": "^2.13.2",
+    "langchain": "^0.2.9",
+    "ollama": "^0.5.2",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.4.168"
+  }
+}

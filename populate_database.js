@@ -1,14 +1,15 @@
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-
+import embeddings from "./get_embedding_function.js";
 import { Document } from "@langchain/core/documents";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 async function Main() {
   const doc = await dLoader("data");
-  const splitteddoc = await splitdoc(doc);
+  const splittedDoc = await splitdoc(doc);
 }
 
+// helper functions
 // import document load
 const dLoader = async function (Path) {
   try {

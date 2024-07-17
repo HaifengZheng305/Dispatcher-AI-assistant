@@ -1,5 +1,5 @@
 node_modules
 .vscode
 ChromaDB.js
-chroma
-data
+chroma/
+data/

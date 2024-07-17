@@ -1,12 +1,13 @@
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import embeddings from "./get_embedding_function.js";
-import { Document } from "@langchain/core/documents";
+import embed_fn from "./get_embedding_function.js";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { Chroma } from "@langchain/community/vectorstores/chroma";
 
 async function Main() {
   const doc = await dLoader("data");
-  const splittedDoc = await splitdoc(doc);
+  const chunks = await splitdoc(doc);
+  addToChroma(chunks);
 }
 
 // helper functions
@@ -41,5 +42,15 @@ const splitdoc = async function (doc) {
     throw error;
   }
 };
+
+async function addToChroma(docs) {
+  // Load the existing database
+  const vectorStore = await Chroma.fromExistingCollection(embed_fn, {
+    collectionName: "a-test-collection",
+  });
+  const response = await vectorStore.similaritySearch("college", 1);
+
+  console.log(response);
+}
 
 Main();

@@ -1,4 +1,5 @@
 import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
+import { Ollama } from "@langchain/community/llms/ollama";
 
 const embed_fn = new OllamaEmbeddings({
   model: "nomic-embed-text", // default value

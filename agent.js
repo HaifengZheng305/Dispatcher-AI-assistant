@@ -1,7 +1,7 @@
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Ollama } from "@langchain/community/llms/ollama";
-import embed_fn from "./get_embedding_function.js";
+import embed_fn from "./models.js";
 import readline from "node:readline";
 
 async function Main() {
@@ -40,12 +40,14 @@ const response = async function (queryText) {
     question: queryText,
   });
 
+  //the LLM model and the output.
   const ollama = new Ollama({
     baseUrl: "http://localhost:11434", // Default value
     model: "llama3", // Default value
   });
 
   const stream = await ollama.stream(fromattedInputPrompt);
+  //
 
   const chunks = [];
   for await (const chunk of stream) {
@@ -58,3 +60,5 @@ const response = async function (queryText) {
 /////////////////////////
 // create the response using Excel file
 //////////////////////////
+
+Main();

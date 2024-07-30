@@ -1,6 +1,6 @@
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import embed_fn from "./get_embedding_function.js";
+import embed_fn from "../get_embedding_function.js";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 

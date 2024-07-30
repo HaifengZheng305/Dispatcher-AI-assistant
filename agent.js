@@ -4,12 +4,6 @@ import { Ollama } from "@langchain/community/llms/ollama";
 import embed_fn from "./get_embedding_function.js";
 import readline from "node:readline";
 
-const InputPrompt = new PromptTemplate({
-  inputVariables: ["context", "question"],
-  template:
-    "Answer the question based only on the following context: {context}. Answer the question based on the above context: {question}",
-});
-
 async function Main() {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -22,8 +16,14 @@ async function Main() {
 }
 
 /////////////////////////
-// create the response
+// create the response using PDf
 //////////////////////////
+const InputPrompt = new PromptTemplate({
+  inputVariables: ["context", "question"],
+  template:
+    "Answer the question based only on the following context: {context}. Answer the question based on the above context: {question}",
+});
+
 const response = async function (queryText) {
   const vectorStore = new Chroma(embed_fn, {
     collectionName: "data-collection",
@@ -55,4 +55,6 @@ const response = async function (queryText) {
   return chunks.join("");
 };
 
-Main();
+/////////////////////////
+// create the response using Excel file
+//////////////////////////

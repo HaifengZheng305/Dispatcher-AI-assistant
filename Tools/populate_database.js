@@ -7,8 +7,10 @@ import { Chroma } from "@langchain/community/vectorstores/chroma";
 async function Main() {
   const doc = await dLoader("data");
   const chunks = await splitdoc(doc);
+  const testing = await chunkID(chunks);
   addToChroma(chunks);
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// helper functions///////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -38,10 +40,9 @@ const splitdoc = async function (doc) {
       chunkOverlap: 80,
     });
 
-    const splitdocs = await textSplitter.splitDocuments(doc);
+    const splitDocs = await textSplitter.splitDocuments(doc);
 
-    const docWithID = await chunkID(splitdocs);
-    return docWithID;
+    return splitDocs;
   } catch (error) {
     console.error("Error Splitting Doc:", error);
     throw error;
@@ -65,6 +66,7 @@ const chunkID = async function (chunks) {
       lastPageId = pageNumber;
 
       chunk["id"] = `${source}:${pageNumber}:${currentChunkIndex}`;
+      chunk["metadata"]["pageNumber"] = pageNumber;
     }
     return chunks;
   } catch (error) {
@@ -80,9 +82,15 @@ async function addToChroma(docs) {
   const vectorStore = new Chroma(embed_fn, {
     collectionName: "data-collection",
   });
-  // const ids = await vectorStore.addDocuments(docs);
-  const response = await vectorStore.similaritySearch("Free days", 2);
-  console.log(response[1]["pageContent"]);
+
+  const docWithID = await chunkID(docs);
+
+  const chunkId = [];
+
+  console.log(docWithID);
+  const ids = await vectorStore.addDocuments(docWithID);
+  const response = await vectorStore.similaritySearch("school", 5);
+  console.log(response);
 }
 
 Main();

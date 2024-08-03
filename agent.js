@@ -25,6 +25,7 @@ const InputPrompt = new PromptTemplate({
 });
 
 const response = async function (queryText) {
+  // This can be converted in to a tool probably//
   const vectorStore = new Chroma(embed_fn, {
     collectionName: "data-collection",
   });
@@ -34,6 +35,8 @@ const response = async function (queryText) {
   const context_text = response
     .map((document) => document["pageContent"])
     .join("\n\n---\n\n");
+
+  /////////////////////////////////////////////
 
   const fromattedInputPrompt = await InputPrompt.format({
     context: context_text,

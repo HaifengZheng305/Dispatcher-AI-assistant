@@ -87,8 +87,7 @@ async function addToChroma(docs) {
 
   const chunkId = [];
 
-  console.log(docWithID);
-  const ids = await vectorStore.addDocuments(docWithID);
+  // const ids = await vectorStore.addDocuments(docWithID);
   const response = await vectorStore.similaritySearch("school", 5);
   console.log(response);
 }

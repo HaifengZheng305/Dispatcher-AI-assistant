@@ -1,8 +1,11 @@
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { Ollama } from "@langchain/community/llms/ollama";
+// import { Ollama } from "@langchain/community/llms/ollama";
+import { ChatOllama } from "@langchain/ollama";
 import embed_fn from "./models.js";
 import readline from "node:readline";
+import { DynamicStructuredTool } from "@langchain/core/tools";
+import { z } from "zod";
 
 async function Main() {
   const rl = readline.createInterface({
@@ -30,34 +33,81 @@ const response = async function (queryText) {
     collectionName: "data-collection",
   });
 
-  const response = await vectorStore.similaritySearch(queryText, 5);
-
-  const context_text = response
-    .map((document) => document["pageContent"])
-    .join("\n\n---\n\n");
-
-  /////////////////////////////////////////////
-
-  const fromattedInputPrompt = await InputPrompt.format({
-    context: context_text,
-    question: queryText,
+  const llmForTool = new ChatOllama({
+    model: "llama3-groq-tool-use",
   });
 
-  //the LLM model and the output.
-  const ollama = new Ollama({
-    baseUrl: "http://localhost:11434", // Default value
-    model: "llama3", // Default value
+  // const qaTool = new DynamicStructuredTool({
+  //   name: "Tell user whether yes or no",
+  //   description: "tell me yes or no",
+  //   schema: z.object({
+  //     queryText: z.string().describe("what is the user asking?"),
+  //   }),
+  //   func: async ({ queryText }) =>
+  //     //   {
+  //     //   // const response = await vectorStore.similaritySearch(queryText, 5);
+
+  //     //   // const context_text = response
+  //     //   //   .map((document) => document["pageContent"])
+  //     //   //   .join("\n\n---\n\n");
+
+  //     //   // return context_text;
+  //     //   return "testing";
+  //     // }
+  //     queryText,
+  // });
+
+  const qaTool = new DynamicStructuredTool({
+    name: "Shipping-line-information",
+    description:
+      "Retrieve specific shipping line information from the vectorstore based on the input prompt.",
+    schema: z.object({
+      shippingLine: z.string().describe("The shipping line"),
+      inqury: z
+        .string()
+        .describe("The information wanted to from the shipping line"),
+    }),
+    func: async ({ inputPrompt }) => {
+      const response = await vectorStore.similaritySearch(inputPrompt, 5);
+
+      const context_text = response
+        .map((document) => document["pageContent"])
+        .join("\n\n---\n\n");
+
+      return context_text;
+    },
   });
 
-  const stream = await ollama.stream(fromattedInputPrompt);
-  //
+  const randomNumberGenerator = new DynamicStructuredTool({
+    name: "random-number-generator",
+    description: "generates a random number between two input numbers",
+    schema: z.object({
+      low: z.number().describe("The lower bound of the generated number"),
+      high: z.number().describe("The upper bound of the generated number"),
+    }),
+    func: async ({ low, high }) =>
+      (Math.random() * (high - low) + low).toString(), // Outputs still must be strings,
+  });
+  const llmWithTools = llmForTool.bindTools([qaTool, randomNumberGenerator]);
 
-  const chunks = [];
-  for await (const chunk of stream) {
-    chunks.push(chunk);
-  }
+  // const fromattedInputPrompt = await InputPrompt.format({
+  //   context: context_text,
+  //   question: queryText,
+  // });
 
-  return chunks.join("");
+  const resultFromTool = await llmWithTools.invoke(queryText);
+
+  // const stream = await ollama.stream(fromattedInputPrompt);
+  // //
+
+  // // const chunks = [];
+  // // for await (const chunk of stream) {
+  // //   chunks.push(chunk);
+  // // }
+
+  // // return chunks.join("");
+
+  return resultFromTool;
 };
 
 /////////////////////////

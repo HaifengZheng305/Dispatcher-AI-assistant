@@ -19,11 +19,13 @@
   "homepage": "https://github.com/HaifengZheng305/Trucking-Info-Chatbot#readme",
   "dependencies": {
     "@langchain/community": "^0.2.18",
+    "@langchain/ollama": "^0.0.4",
     "chromadb": "^1.8.1",
     "chromadb-default-embed": "^2.13.2",
     "langchain": "^0.2.9",
     "ollama": "^0.5.2",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^4.4.168"
+    "pdfjs-dist": "^4.4.168",
+    "zod": "^3.23.8"
   }
 }

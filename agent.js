@@ -21,10 +21,16 @@ async function Main() {
 /////////////////////////
 // create the response using PDf
 //////////////////////////
-const InputPrompt = new PromptTemplate({
+const FinalPrompt = new PromptTemplate({
   inputVariables: ["context", "question"],
   template:
     "Answer the question based only on the following context: {context}. Answer the question based on the above context: {question}",
+});
+
+const InputPrompt = new PromptTemplate({
+  inputVariables: ["inqury"],
+  template:
+    "You are an tool selecting agent that picks the best tools to use for Trucking Dispatchers to gather shipping - line information and container information. When you see any from the following list, remember they are refering to a shipping line container. Shipping line: CMA, OOCL, ONE, HALAG, YMLU. If the inqury is asking for general shipping line information or containers,use the Shipping-line-document tool.  {inqury}",
 });
 
 const response = async function (queryText) {
@@ -58,14 +64,11 @@ const response = async function (queryText) {
   // });
 
   const qaTool = new DynamicStructuredTool({
-    name: "Shipping-line-information",
+    name: "Shipping-line-document",
     description:
-      "Retrieve specific shipping line information from the vectorstore based on the input prompt.",
+      "Retrieve demurrage, return free days or, detention for (including:CMA, OOCL, HALAG) shipping-line. from document from the vectorstore based on the input prompt. ",
     schema: z.object({
-      shippingLine: z.string().describe("The shipping line"),
-      inqury: z
-        .string()
-        .describe("The information wanted to from the shipping line"),
+      inqury: z.string().describe("The entire prompt "),
     }),
     func: async ({ inputPrompt }) => {
       const response = await vectorStore.similaritySearch(inputPrompt, 5);
@@ -95,7 +98,11 @@ const response = async function (queryText) {
   //   question: queryText,
   // });
 
-  const resultFromTool = await llmWithTools.invoke(queryText);
+  const fromattedInputPrompt = await InputPrompt.format({
+    inqury: queryText,
+  });
+
+  const resultFromTool = await llmWithTools.invoke(fromattedInputPrompt);
 
   // const stream = await ollama.stream(fromattedInputPrompt);
   // //
